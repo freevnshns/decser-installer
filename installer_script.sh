@@ -31,12 +31,6 @@ apt-get update
 apt-get --assume-yes install apache2 apache2-mpm-prefork apache2-utils libexpat1
 apt-get --assume-yes install libapache2-mod-wsgi python-dev python-pip imagemagick
 
-pip install Flask
-
-# Extract Comslav Package Archive
-
-tar -xf ihs.tar.gz
-
 # Copying & Enabling Apache Configuration files
 
 rm -f /etc/apache2/sites-available/*.conf
@@ -49,25 +43,12 @@ cp confs/public-web-api.conf /etc/apache2/sites-available/public-web-api.conf
 # Creating User File Upload Directories and set env variables
 # edit .bashrc in user and something else in limited-user
 
-#Set Permissions
+echo 'IHS_DATA_DIR=/var/www/data/' >> /etc/environment
+echo 'IHS_APP_DIR=/var/www/web-application/' >> /etc/environment
 
-chown -R www-data /home/ihs
-chmod -R 755 /home/ihs
+# INSTALL web-application and public-web-api
 
-# Copy Main Application to apache web server root
-cp -Rf ihs/* /var/www/
-
-#Execution Permissions for scripts
-chmod +x /var/www/web-application/scripts/*
-
-#Enable SSL Module
-a2enmod wsgi
-
-#Enable Sites
-a2ensite web-application
-a2ensite public-web-api
-
-# web-application Install End
+./web-application_installer.sh
 
 service apache2 restart
 OUTAPACHE=$?
