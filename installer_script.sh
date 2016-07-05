@@ -27,7 +27,6 @@ apt-get update
 # Install Dependencies and Applications
 
 apt-get --assume-yes install apache2 apache2-mpm-prefork apache2-utils libexpat1
-apt-get --assume-yes install libapache2-mod-wsgi python-dev python-pip imagemagick
 
 # Copying & Enabling Apache Configuration files
 

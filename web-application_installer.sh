@@ -1,10 +1,14 @@
 #!/bin/bash
 
 # set environment variables
+set -e
 
 if (( $(grep IHS_DATA_DIR /etc/environment -c) == 0 )); then
         echo 'IHS_DATA_DIR=/var/www/data/' >> /etc/environment
 		echo 'IHS_APP_DIR=/var/www/web-application/' >> /etc/environment
+		export IHS_DATA_DIR=/var/www/data/
+		export IHS_APP_DIR=/var/www/web-application/
+		apt-get --assume-yes install python-virtualenv python-pip libapache2-mod-wsgi python-dev imagemagick
 		mkdir ${IHS_APP_DIR}
 		mkdir ${IHS_DATA_DIR}
 		virtualenv --no-site-packages ${IHS_APP_DIR}../virtenv
@@ -12,8 +16,20 @@ fi
 
 # Extract Main Application to apache web server root
 
-tar -xf web-appliaction.tar -C ${IHS_APP_DIR}
-cp confs/web-application.conf /etc/apache2/sites-available/web-application.conf
+tar -xvf web-application.tar -C ${IHS_APP_DIR}
+
+echo "<VirtualHost *:10000>
+    ServerName example.com
+
+    WSGIDaemonProcess web-application
+    WSGIScriptAlias / ${IHS_APP_DIR}web-application.wsgi
+
+    <Directory /var/www/web-application>
+        WSGIProcessGroup web-application
+        WSGIApplicationGroup %{GLOBAL}
+        Require all granted
+    </Directory>
+</VirtualHost>" > /etc/apache2/sites-available/web-application.conf
 
 # Fix Permissions
 
@@ -31,10 +47,6 @@ pip install -r ${IHS_APP_DIR}requirements.txt
 
 # Enable wshi mod
 
-a2enmod wsgi
-
 # Enable Sites
-
-a2ensite web-application
 
 # web-application install end
