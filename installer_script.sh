@@ -1,13 +1,11 @@
 #!/bin/bash
 
-# Error Logging
-
 # Adding users
 
 useradd user -m
 useradd limited-user -m -s /sbin/nologin
 
-# SSH Configurations
+# SSH Configuration
 
 ssh-keygen -t rsa -f user_key -P ""
 mkdir -p /home/user/.ssh
@@ -20,7 +18,7 @@ cat limited-user_key.pub > /home/limited-user/.ssh/authorized_keys
 chown -R user:user /home/user/.ssh
 chown -R limited-user:limited-user /home/limited-user/.ssh
 
-# SSH Conf END
+# SSH Configuration END
 
 # web-application
 
@@ -33,29 +31,20 @@ apt-get --assume-yes install libapache2-mod-wsgi python-dev python-pip imagemagi
 
 # Copying & Enabling Apache Configuration files
 
-rm -f /etc/apache2/sites-available/*.conf
-rm -f /etc/apache2/sites-enabled/*.conf
+rm -f /etc/apache2/sites-available/*
+rm -f /etc/apache2/sites-enabled/*
 
 cp confs/apache2.conf /etc/apache2/apache2.conf
-cp confs/web-application.conf /etc/apache2/sites-available/web-application.conf
-cp confs/public-web-api.conf /etc/apache2/sites-available/public-web-api.conf
 
-# Creating User File Upload Directories and set env variables
-# edit .bashrc in user and something else in limited-user
+# INSTALL web-application
 
-echo 'IHS_DATA_DIR=/var/www/data/' >> /etc/environment
-echo 'IHS_APP_DIR=/var/www/web-application/' >> /etc/environment
-
-# INSTALL web-application and public-web-api
+chmod +x web-application_installer.sh
 
 ./web-application_installer.sh
 
-service apache2 restart
-OUTAPACHE=$?
-if [[ $OUTSAPACHE -eq 1 ]]; then
-	echo "Apache Error"
-	exit 1
-fi
+a2enmod wsgi
+
+a2ensite web-application
 
 # Owncloud Installation
 
@@ -65,9 +54,12 @@ sh -c "echo 'deb http://download.owncloud.org/download/repositories/stable/Debia
 apt-get update
 apt-get install owncloud
 
-# Apache Global Redirection Scripts
+service apache2 restart
 
-cp ports.conf /etc/apache2/ports.conf
-
+OUTAPACHE=$?
+if [[ $OUTSAPACHE -eq 1 ]]; then
+	echo "Apache Error"
+	exit 1
+fi
 
 # END-OF-SCRIPT
