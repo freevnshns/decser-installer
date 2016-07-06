@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # Adding users
 
 useradd user -m
@@ -32,8 +34,7 @@ apt-get --assume-yes install apache2 apache2-mpm-prefork apache2-utils libexpat1
 
 rm -f /etc/apache2/sites-available/*
 rm -f /etc/apache2/sites-enabled/*
-
-cp confs/apache2.conf /etc/apache2/apache2.conf
+rm -rf /var/www/*
 
 # INSTALL web-application
 
