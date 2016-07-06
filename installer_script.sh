@@ -4,7 +4,7 @@ set -e
 
 # Adding users
 
-useradd user -m
+useradd user -m -s /bin/bash
 useradd limited-user -m -s /sbin/nologin
 
 # SSH Configuration

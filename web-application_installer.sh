@@ -46,7 +46,7 @@ chmod -R 740 ${IHS_APP_DIR}
 
 chmod +x ${IHS_APP_DIR}scripts/*
 
-# Packages install python
+# Install requirements to virtualenv
 
 source ${IHS_APP_DIR}../virtenv/bin/activate
 
@@ -54,4 +54,4 @@ pip install -r ${IHS_APP_DIR}requirements.txt
 
 service apache2 restart
 
-# web-application install end
+# web-application module install end
