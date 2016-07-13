@@ -1,19 +1,21 @@
 #!/bin/bash
 
 # set environment variables
+
 set -e
+
+export IHS_DATA_DIR=/var/www/data/
+export IHS_APP_DIR=/var/www/web-application/
 
 if (( $(grep IHS_DATA_DIR /etc/environment -c) == 0 )); then
 	apt-get --assume-yes install python-virtualenv python-pip libapache2-mod-wsgi python-dev imagemagick
-	echo 'IHS_DATA_DIR=/var/www/data/' >> /etc/environment
-	echo 'IHS_APP_DIR=/var/www/web-application/' >> /etc/environment
-	echo 'IHS_DATA_DIR=/var/www/data/' >> /etc/apache2/envvars
-	echo 'IHS_APP_DIR=/var/www/web-application/' >> /etc/apache2/envvars
-	export IHS_DATA_DIR=/var/www/data/
-	export IHS_APP_DIR=/var/www/web-application/
 	mkdir ${IHS_APP_DIR}
 	mkdir ${IHS_DATA_DIR}
 	virtualenv --no-site-packages ${IHS_APP_DIR}../virtenv
+	echo 'IHS_DATA_DIR=/var/www/data/' >> /etc/apache2/envvars
+	echo 'IHS_APP_DIR=/var/www/web-application/' >> /etc/apache2/envvars
+	echo 'IHS_DATA_DIR=/var/www/data/' >> /etc/environment
+	echo 'IHS_APP_DIR=/var/www/web-application/' >> /etc/environment
 fi
 
 # Extract Main Application to apache web server root
@@ -51,6 +53,8 @@ chmod +x ${IHS_APP_DIR}scripts/*
 source ${IHS_APP_DIR}../virtenv/bin/activate
 
 pip install -r ${IHS_APP_DIR}requirements.txt
+
+deactivate
 
 service apache2 restart
 

@@ -22,6 +22,18 @@ chown -R limited-user:limited-user /home/limited-user/.ssh
 
 # SSH Configuration END
 
+# Install Supervisor
+
+apt-get --assume-yes install supervisor
+
+# Install Aria2 download client
+
+mkdir -p /home/user/downloads
+
+apt-get --assume-yes install aria2
+
+echo '\n[command:aria2]\ncommand=/usr/bin/aria2c --enable-rpc --rpc-listen-all --dir=/home/user/downloads --save-session=/home/user/downloads/session_aria --force-save=true --rpc-save-upload-metadata=true' >> /etc/supervisor/supervisord.conf
+
 # web-application
 
 apt-get update
@@ -52,7 +64,7 @@ wget -nv https://download.owncloud.org/download/repositories/stable/Debian_8.0/R
 apt-key add - < Release.key
 sh -c "echo 'deb http://download.owncloud.org/download/repositories/stable/Debian_8.0/ /' >> /etc/apt/sources.list.d/owncloud.list"
 apt-get update
-apt-get install owncloud
+apt-get --assume-yes install owncloud
 
 service apache2 restart
 
@@ -61,5 +73,7 @@ if [[ $OUTSAPACHE -eq 1 ]]; then
 	echo "Apache Error"
 	exit 1
 fi
+
+apt-get --assume-yes install ddclient
 
 # END-OF-SCRIPT
