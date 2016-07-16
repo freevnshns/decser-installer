@@ -32,7 +32,7 @@ mkdir -p /home/user/downloads
 
 apt-get --assume-yes install aria2
 
-echo '\n[command:aria2]\ncommand=/usr/bin/aria2c --enable-rpc --rpc-listen-all --dir=/home/user/downloads --save-session=/home/user/downloads/session_aria --force-save=true --rpc-save-upload-metadata=true' >> /etc/supervisor/supervisord.conf
+printf '\n[program:aria2]\ncommand=/usr/bin/aria2c --enable-rpc --rpc-listen-all --dir=/home/user/downloads --save-session=/home/user/downloads/session_aria --force-save=true --rpc-save-upload-metadata=true --follow-torrent=true --follow-metalink=true --force-save=true --on-download-error=/home/user/downloads/aria_dwnld_fail_hook.sh' >> /etc/supervisor/supervisord.conf
 
 # web-application
 
@@ -48,15 +48,21 @@ rm -f /etc/apache2/sites-available/*
 rm -f /etc/apache2/sites-enabled/*
 rm -rf /var/www/*
 
-# INSTALL web-application
+# INSTALL web-application (with public-apis)
 
 chmod +x web-application_installer.sh
 
+chmod +x public-api_installer.sh
+
 ./web-application_installer.sh
+
+./public-api_installer.sh
 
 a2enmod wsgi
 
 a2ensite web-application
+
+a2ensite public-api
 
 # Owncloud Installation
 
