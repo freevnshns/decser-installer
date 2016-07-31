@@ -12,8 +12,8 @@ if (( $(grep IHS_DATA_DIR /etc/environment -c) == 0 )); then
 	mkdir -p ${IHS_APP_DIR}
 	mkdir -p ${IHS_DATA_DIR}
 	virtualenv --no-site-packages ${IHS_APP_DIR}../virtenv
-	echo 'IHS_DATA_DIR=/var/www/data/' >> /etc/apache2/envvars
-	echo 'IHS_APP_DIR=/var/www/web-application/' >> /etc/apache2/envvars
+	echo 'export IHS_DATA_DIR=/var/www/data/' >> /etc/apache2/envvars
+	echo 'export IHS_APP_DIR=/var/www/web-application/' >> /etc/apache2/envvars
 	echo 'IHS_DATA_DIR=/var/www/data/' >> /etc/environment
 	echo 'IHS_APP_DIR=/var/www/web-application/' >> /etc/environment
 fi

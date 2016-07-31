@@ -4,16 +4,17 @@ export IHS_API_DIR=/var/www/public-api/
 
 if (( $(grep IHS_API_DIR /etc/environment -c) == 0 )); then
 	mkdir -p ${IHS_API_DIR}public_uploads
-	echo 'IHS_API_DIR=/var/www/public-api/' >> /etc/apache2/envvars
+	echo 'export IHS_API_DIR=/var/www/public-api/' >> /etc/apache2/envvars
 	echo 'IHS_API_DIR=/var/www/public-api/' >> /etc/environment
 fi
 
 tar -xvf public-api.tar -C ${IHS_API_DIR}
 
-echo "<VirtualHost *:10000>
+echo "Listen 10000
+<VirtualHost *:10000>
 
     WSGIDaemonProcess public-api
-    WSGIScriptAlias / ${IHS_API_DIR}public-api.wsgi
+    WSGIScriptAlias / ${IHS_API_DIR}public-web-api.wsgi
 
     <Directory /var/www/public-api>
         WSGIProcessGroup public-api

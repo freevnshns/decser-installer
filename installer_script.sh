@@ -19,7 +19,7 @@ apt-get --assume-yes install aria2
 # Adding users
 
 useradd user -m -s /bin/bash
-useradd limited-user -m -s /sbin/nologin
+useradd limited-user -m -s /usr/sbin/nologin
 
 # SSH Configuration
 
@@ -65,7 +65,8 @@ a2ensite web-application
 a2ensite public-api
 
 # Owncloud Installation
-
+sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password root'
+sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password root'
 wget -nv https://download.owncloud.org/download/repositories/stable/Debian_8.0/Release.key -O Release.key
 apt-key add - < Release.key
 sh -c "echo 'deb http://download.owncloud.org/download/repositories/stable/Debian_8.0/ /' >> /etc/apt/sources.list.d/owncloud.list"
