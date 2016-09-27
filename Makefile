@@ -3,7 +3,7 @@ SHELL := /bin/bash
 default:
 	echo "Here is help"
 
-full: pkg-deps user apache aria mediatomb supervisor owncloud system-manager web-application
+full: pkg-deps user apache aria mediatomb supervisor owncloud system-manager web-application xmpp
 	echo "Successessfullllyy Installed Please reboot"
 
 pkg-deps:
@@ -34,11 +34,6 @@ owncloud:
 	apt-get update
 	apt-get --assume-yes install owncloud
 
-supervisor:
-	printf '\n[program:aria2]\ncommand=/usr/bin/aria2c --enable-rpc --rpc-listen-all --dir=/home/user/downloads --save-session=/home/user/downloads/.conf/session_aria --force-save=true --rpc-save-upload-metadata=true --follow-torrent=true --follow-metalink=true --force-save=true --save-session-interval=60 --input-file=/home/user/downloads/.conf/session_aria --on-download-error=/home/user/downloads/.conf/aria_dwnld_fail_hook.sh' >> /etc/supervisor/supervisord.conf
-	printf '\n[program:system-manager]\ncommand=/usr/bin/python3 /system-manager/system-manager.py' >> /etc/supervisor/supervisord.conf
-	printf '\n[program:set-cam-perms]\ncommand=chmod 666 /dev/video0\nstartsecs=0' >> /etc/supervisor/supervisord.conf
-
 system-manager:
 	mkdir -p /system-manager/
 	cp system-manager.py /system-manager/system-manager.py
@@ -49,16 +44,25 @@ mediatomb:
 web-application:
 	pip install Flask
 	printf "<VirtualHost *:80>\n\tWSGIDaemonProcess web-application\n\tWSGIScriptAlias / /var/www/web-application/web-application.wsgi\n\t\t<Directory /var/www/web-application>\n\t\tWSGIProcessGroup web-application\n\t\tWSGIApplicationGroup %%{GLOBAL}\n\t\tRequire all granted\n\t</Directory>\n</VirtualHost>" > /etc/apache2/sites-enabled/000-default.conf
-
 	mkdir -p /var/www/web-application/
 	cp web-application.py web-application.wsgi /var/www/web-application/
 	chown -R www-data:www-data /var/www/web-application/
 	chmod -R 740 /var/www/web-application/
 
 printing:
-		echo "Setup CUPS"
+	echo "Setup CUPS"
 
-xmpp:
+supervisor: envcheck
+	printf '\n[program:aria2]\ncommand=/usr/bin/aria2c --enable-rpc --rpc-listen-all --dir=/home/user/downloads --save-session=/home/user/downloads/.conf/session_aria --force-save=true --rpc-save-upload-metadata=true --follow-torrent=true --follow-metalink=true --force-save=true --save-session-interval=60 --input-file=/home/user/downloads/.conf/session_aria --on-download-error=/home/user/downloads/.conf/aria_dwnld_fail_hook.sh' >> /etc/supervisor/supervisord.conf
+	printf '\n[program:system-manager]\ncommand=/usr/bin/python3 /system-manager/system-manager.py\nenvironment = XMPP_HOST=%s , XMPP_DOMAIN_NAME=%s' "$(XMPP_HOST)" "$(HOSTNAME)" >> /etc/supervisor/supervisord.conf
+	printf '\n[program:set-cam-perms]\ncommand=chmod 666 /dev/video0\nstartsecs=0\nstartretries=3' >> /etc/supervisor/supervisord.conf
+
+xmpp: envcheck
 	echo "Setting up prosody"
-	sed -i -e '100, 103d' -e 's/VirtualHost "example.com"/VirtualHost "'$(HOSTNAME)'.local"/' /etc/prosody/prosody.cfg.lua
+	sed -i -e '100, 103d' -e '170, 180d' -e 's/VirtualHost "example.com"/VirtualHost "'$(HOSTNAME)'.local"/' /etc/prosody/prosody.cfg.lua
 	prosodyctl register $(XMPP_HOST) $(HOSTNAME).local abcd
+	prosodyctl restart
+
+envcheck:
+	test -n "$(XMPP_HOST)"
+	test -n "$(HOSTNAME)"
