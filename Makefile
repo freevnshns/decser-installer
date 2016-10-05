@@ -43,9 +43,10 @@ mediatomb:
 
 web-application:
 	pip install Flask
+	pip install numpy --upgrade
 	printf "<VirtualHost *:80>\n\tWSGIDaemonProcess web-application\n\tWSGIScriptAlias / /var/www/web-application/web-application.wsgi\n\t\t<Directory /var/www/web-application>\n\t\tWSGIProcessGroup web-application\n\t\tWSGIApplicationGroup %%{GLOBAL}\n\t\tRequire all granted\n\t</Directory>\n</VirtualHost>" > /etc/apache2/sites-enabled/000-default.conf
 	mkdir -p /var/www/web-application/
-	cp web-application.py web-application.wsgi /var/www/web-application/
+	cp app.py web-application.wsgi /var/www/web-application/
 	chown -R www-data:www-data /var/www/web-application/
 	chmod -R 740 /var/www/web-application/
 
